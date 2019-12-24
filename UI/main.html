@@ -1,0 +1,120 @@
+      <!DOCTYPE html>
+      <html>
+          <head>
+              <title>Checkin</title>
+
+              <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+              <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      	      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+              <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+          		<script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+          		<script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+          		<script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+          		<script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+          		<script type="text/javascript" src="lib/url-template/url-template.js"></script>
+          		<script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+          		<script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+          		<script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+          		<script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+          		<script type="text/javascript" src="apigClient.js"></script>
+              <script src="https://sdk.amazonaws.com/js/aws-sdk-2.595.0.min.js"></script>
+              <script type="text/javascript">
+                alert("hello");
+                var IdentityPoolId = "us-east-1:f2b048f4-34d9-4ba5-b750-aeabc2e0a4b9";
+                AWS.config.update({
+                  region: 'us-east-1',
+                credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: IdentityPoolId
+    })});
+                var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
+                var queueURL="https://sqs.us-east-1.amazonaws.com/463589813520/meetup";
+                var params = {
+                 AttributeNames: [
+                    "SentTimestamp"
+                 ],
+                 MaxNumberOfMessages: 10,
+                 MessageAttributeNames: [
+                    "All"
+                 ],
+                 QueueUrl: queueURL,
+                 VisibilityTimeout: 20,
+                 WaitTimeSeconds: 20
+                };
+                var message;
+                sqs.receiveMessage(params, function(err, data) {
+                if (err) {
+                  console.log("Receive Error", err);
+                } else if (data.Messages) {
+                  var deleteParams = {
+                    QueueUrl: queueURL,
+                    ReceiptHandle: data.Messages[0].ReceiptHandle
+                  };
+                  message = data.Messages[0].Body;
+                
+                  // alert(message);
+                  var array=message.split(":");
+                var status=array[0];
+                alert(status);
+                var faceid=array[1];
+                alert(faceid);
+                var body = {
+                  "status" : status,
+                  "faceid" : faceid 
+                  };
+                  var apigClient = apigClientFactory.newClient();
+                  var additionalParams = {
+      headers: {
+        
+      },
+      queryParams: {}
+    };
+                if(status==="checkin")
+                {
+                  apigClient.checkinPost(params, body, additionalParams).then(function(result)
+                  {
+                    var obj=JSON.parse(result.data);
+                    var name=obj.name;
+                    console.log("name" + name);
+                    // alert(name);
+                    document.getElementById("container").innerHTML="welcome " + name;
+                    document.getElementById("container").style.fontSize = "xx-large";
+                    //rediect this name to the welcome page
+                  }).catch(function(result){
+                    console.log(result);
+                    // alert(result);
+                  });
+                }
+                if(status==="unknown")
+                {
+                  localStorage.setItem("status", status);
+                  localStorage.setItem("faceid", faceid);
+                  window.location.replace('https://meetup-assistant.s3.amazonaws.com/unknown.html');
+                }
+                  sqs.deleteMessage(deleteParams, function(err, data) {
+                    if (err) {
+                      console.log("Delete Error", err);
+                    } else {
+                      console.log("Message Deleted", data);
+                    }
+                  });
+                }
+              });
+                //processing the message and deciding based on the status of the message  whether it is checkin or unknown
+                
+              </script>
+      		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+          </head>
+        <body>
+          <div id="container">
+            <h1 align="center">Checkin or First-Time</h1>
+             <hr>
+             <div id="bot-response"></div>
+             <div class="chat-box" >
+             <form>
+             </form> 
+            </div>
+            <br>
+          </div>
+        </body>
+      </html>
+      </html>

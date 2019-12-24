@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Checkin</title>
+
+        <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.js"></script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+       <script type="text/javascript" src="lib/axios/dist/axios.standalone.js"></script>
+    		<script type="text/javascript" src="lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    		<script type="text/javascript" src="lib/CryptoJS/rollups/sha256.js"></script>
+    		<script type="text/javascript" src="lib/CryptoJS/components/hmac.js"></script>
+    		<script type="text/javascript" src="lib/CryptoJS/components/enc-base64.js"></script>
+    		<script type="text/javascript" src="lib/url-template/url-template.js"></script>
+    		<script type="text/javascript" src="lib/apiGatewayCore/sigV4Client.js"></script>
+    		<script type="text/javascript" src="lib/apiGatewayCore/apiGatewayClient.js"></script>
+    		<script type="text/javascript" src="lib/apiGatewayCore/simpleHttpClient.js"></script>
+    		<script type="text/javascript" src="lib/apiGatewayCore/utils.js"></script>
+    		<script type="text/javascript" src="apigClient.js"></script>
+    		<script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+        <script type="text/javascript" src="index.js"></script>
+        <script type="text/javascript">
+          var AWS = require('aws-sdk');
+          AWS.config.update({region: 'us-east-1'})
+          var sqs= new AWS.SQS({apiVersion: '2012-11-05'});
+          //code to get the sqs messages goes here
+          //let body be the top message from sqs
+          var array=body.split(":");
+          var status=array[0];
+          var faceid=array[1];
+          var transfer = {"status" : status, "faceid" : faceid};
+
+          if(status.localeCompare("checkin"))
+          {
+          	var welcome=window.location.href;
+          	
+            //redirect to welcome page
+          }
+          if(status.localeCompare("unknown"))
+          {
+            //redirect to unknow.html
+          }
+        </script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    </head>
+  <body>
+    <div class="container">
+      <h1 align="center">Checkin or First-Time</h1>
+       <hr>
+       <div id="bot-response"></div>
+       <div class="chat-box" >
+       <form>
+          <!-- <input type="text" id="user-input-message" placeholder="How can I help you?">
+          <button id="user-input-button" onclick="return sendMessageToApi()"> SEND </button>
+          <p id='output'></p> -->
+          
+        </form> 
+      </div>
+      <br>
+    </div>
+  </body>
+</html>
+</html>
